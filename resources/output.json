@@ -1,0 +1,177 @@
+[
+    {
+        "name": "employee-ssn",
+        "dataPath": "constant",
+        "defaultValue": "RW",
+        "mustBeLength": 9,
+        "format": {
+            "length": 9,
+            "justify": "left",
+            "padChar": " ",
+            "emptyChar": " "
+        }
+    },
+    {
+        "name": "entry-code-tpv",
+        "dataPath": [
+            "w2",
+            "ssn"
+        ],
+        "defaultValue": "TPV",
+        "format": {
+            "length": 3,
+            "justify": "left",
+            "padChar": " ",
+            "emptyChar": " "
+        }
+    },
+    {
+        "name": "processing-code-214",
+        "dataPath": [
+            "w2",
+            "employee-first-name"
+        ],
+        "defaultValue": "214",
+        "format": {
+            "length": 3,
+            "justify": "left",
+            "padChar": " ",
+            "emptyChar": " "
+        }
+    },
+    {
+        "name": "employee-last-name",
+        "dataPath": [
+            "w2",
+            "employee-initial"
+        ],
+        "defaultValue": "",
+        "disallowedCharacters": "-'.",
+        "mustContainAtLeastOneCharacter": true,
+        "format": {
+            "length": 13,
+            "justify": "left",
+            "padChar": " ",
+            "emptyChar": " "
+        }
+    },
+    {
+        "name": "employee-first-name",
+        "dataPath": [
+            "w2",
+            "employee-last-name"
+        ],
+        "defaultValue": "",
+        "disallowedCharacters": "-'.",
+        "mustContainAtLeastOneCharacter": true,
+        "format": {
+            "length": 10,
+            "justify": "left",
+            "padChar": " ",
+            "emptyChar": " "
+        }
+    },
+    {
+        "name": "employee-middle-initial",
+        "dataPath": [
+            "w2",
+            "employee-suffix"
+        ],
+        "defaultValue": "",
+        "disallowedCharacters": "-'.",
+        "optional": true,
+        "format": {
+            "length": 7,
+            "justify": "left",
+            "padChar": " ",
+            "emptyChar": " "
+        }
+    },
+    {
+        "name": "employee-date-of-birth",
+        "dataPath": [
+            "w2",
+            "employee-add2"
+        ],
+        "defaultValue": "",
+        "optional": true,
+        "format": {
+            "length": 8,
+            "justify": "left",
+            "padChar": " ",
+            "emptyChar": " "
+        }
+    },
+    {
+        "name": "blank",
+        "dataPath": [
+            "w2",
+            "employee-add1"
+        ],
+        "defaultValue": "",
+        "format": {
+            "length": 36,
+            "justify": "left",
+            "padChar": " ",
+            "emptyChar": " "
+        }
+    },
+    {
+        "name": "user-control-data",
+        "dataPath": [
+            "w2",
+            "employee-city"
+        ],
+        "defaultValue": "",
+        "optional": true,
+        "format": {
+            "length": 14,
+            "justify": "left",
+            "padChar": " ",
+            "emptyChar": " "
+        }
+    },
+    {
+        "name": "blank-2",
+        "dataPath": [
+            "w2",
+            "employee-state"
+        ],
+        "defaultValue": "",
+        "optional": true,
+        "format": {
+            "length": 20,
+            "justify": "left",
+            "padChar": " ",
+            "emptyChar": " "
+        }
+    },
+    {
+        "name": "requester-identification-code",
+        "dataPath": [
+            "w2",
+            "employee-zip"
+        ],
+        "defaultValue": "OEVS",
+        "format": {
+            "length": 4,
+            "justify": "left",
+            "padChar": " ",
+            "emptyChar": " "
+        }
+    },
+    {
+        "name": "multiple-request-indicator",
+        "dataPath": [
+            "w2",
+            "employee-zip-ext"
+        ],
+        "defaultValue": "000",
+        "format": {
+            "length": 3,
+            "justify": "left",
+            "padChar": " ",
+            "emptyChar": " "
+        }
+    }
+]
