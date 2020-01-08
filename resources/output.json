@@ -46,7 +46,19 @@
             "employee-initial"
         ],
         "defaultValue": "",
-        "disallowedCharacters": "-'.",
+        "mustBeUppercase": true,
+        "digitsAllowed": false,
+        "disallowedCharacters": "-'./",
+        "disallowedPrefixes": [
+            "dr"
+        ],
+        "disallowedSuffixes": [
+            "jr",
+            "sr",
+            "iii",
+            "iv",
+            "v"
+        ],
         "mustContainAtLeastOneCharacter": true,
         "format": {
             "length": 13,
@@ -62,7 +74,19 @@
             "employee-last-name"
         ],
         "defaultValue": "",
-        "disallowedCharacters": "-'.",
+        "mustBeUppercase": true,
+        "digitsAllowed": false,
+        "disallowedCharacters": "-'./",
+        "disallowedPrefixes": [
+            "dr"
+        ],
+        "disallowedSuffixes": [
+            "jr",
+            "sr",
+            "iii",
+            "iv",
+            "v"
+        ],
         "mustContainAtLeastOneCharacter": true,
         "format": {
             "length": 10,
@@ -78,7 +102,19 @@
             "employee-suffix"
         ],
         "defaultValue": "",
-        "disallowedCharacters": "-'.",
+        "mustBeUppercase": true,
+        "digitsAllowed": false,
+        "disallowedCharacters": "-'./",
+        "disallowedPrefixes": [
+            "dr"
+        ],
+        "disallowedSuffixes": [
+            "jr",
+            "sr",
+            "iii",
+            "iv",
+            "v"
+        ],
         "optional": true,
         "format": {
             "length": 7,
@@ -109,6 +145,7 @@
             "employee-add1"
         ],
         "defaultValue": "",
+        "mustBeBlank": true,
         "format": {
             "length": 36,
             "justify": "left",
@@ -139,6 +176,7 @@
         ],
         "defaultValue": "",
         "optional": true,
+        "mustBeBlank": true,
         "format": {
             "length": 20,
             "justify": "left",

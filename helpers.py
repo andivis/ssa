@@ -37,7 +37,6 @@ def appendToFile(s, fileName, end='\n'):
     with io.open(fileName, "a", encoding="utf-8") as text_file:
         print(s, end=end, file=text_file)
 
-
 def numbersOnly(s):
     return ''.join(filter(lambda x: x.isdigit(), s))
 

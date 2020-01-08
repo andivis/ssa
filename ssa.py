@@ -8,18 +8,28 @@ class Ssa:
     def run(self):
         self.initialize()
 
-        items = helpers.getFile('input.txt')
+        files = os.listdir(self.inputDirectory)
 
-        if not items:
-            logging.error("Please put a file called input.txt next to this program and try again")
+        for file in files:
+            self.onItemIndex = 0
+            self.outputFileName = ''
 
-        for item in items.splitlines():
-            self.showStatus(item)
-            self.doItem(item)
+            fileContents = helpers.getFile(os.path.join(self.inputDirectory, file))
+            lines = fileContents.splitlines()
+
+            self.startFile(file)
+
+            for item in lines:
+                self.showStatus(file, item, len(files), len(lines))
+                self.doItem(item, file)                
+                
+            self.finishFile(self.outputFileName)
+
+            self.onFileIndex += 1
 
         self.cleanUp()
 
-    def doItem(self, item):
+    def doItem(self, item, file):
         try:
             record = self.parse(item)
 
@@ -28,6 +38,19 @@ class Ssa:
         except Exception as e:
             logging.error(f'Skipping. Something went wrong.')
             logging.error(e)
+
+    def startFile(self, file):
+        self.outputFileName = os.path.join(self.outputDirectory, file)
+        # make the file empty
+        open(self.outputFileName, 'w').close()
+
+    def finishFile(self, fileName):
+        file = helpers.getFile(fileName)
+
+        # remove final newline character
+        if file.endswith('\n'):
+            file = file[0:-1]
+            helpers.toFile(file, self.outputFileName, '')
 
     def parse(self, item):
         recordType = item[0:2]
@@ -73,34 +96,63 @@ class Ssa:
             line += value
 
         logging.info(f'Output line: {line[0:50]}...')
+
         helpers.appendToFile(line, self.outputFileName, '\n')
 
     def getField(self, field, item):
         result = ''
         
         name = field.get('name', '')
-
         result = item.get(name, '')
+        length = field['format'].get('length', '')
 
         if not result:
             result = field.get('defaultValue', '')
 
-        length = field['format'].get('length', '')
+        if field.get('mustBeBlank', ''):
+            result = ''
+            padCharacter = field['format'].get('padChar', ' ')
+            result = self.pad(result, padCharacter, length)
+
+        if field.get('digitsAllowed', True) == False:
+            result = self.removeNumbers(result)
+
+        for c in field.get('disallowedCharacters', ''):
+            if c in result:
+                logging.error(f'Found {c} in {result}. That character is not allowed in {name}.')
+                result = result.replace(c, '')
+
+        for s in field.get('disallowedPrefixes', ''):
+            if result.lower().startswith(f'{s} '):
+                logging.error(f'{result} starts with "{s} ". That prefix is not allowed in {name}.')
+                result = self.fixInvalid(result, f'{s} ', True)                    
+
+        for s in field.get('disallowedSuffixes', ''):
+            if result.lower().rstrip().endswith(f' {s}'):
+                logging.error(f'{result} ends with " {s}". That suffix is not allowed in {name}.')
+                result = self.fixInvalid(result, f' {s}', False)                    
 
         # too long?
         if len(result) > length:
+            logging.error(f'{result} is too long for field {name}. Shortening it.')
             result = result[0:length]
 
         # too short
         if len(result) < length:
             padCharacter = field['format'].get('padChar', ' ')
-
             result = self.pad(result, padCharacter, length)
 
         if not self.isValid(field, result):
             return ''
 
+        #debug
+        if '0' in result:
+            x = 2
+        
         return result
+
+    def removeNumbers(self, s):
+        return ''.join(filter(lambda x: not x.isdigit(), s))
 
     def isValid(self, field, value):
         result = True
@@ -116,14 +168,6 @@ class Ssa:
                 logging.error(f'{name} must be {mustBeLength} characters')
                 return False
 
-        disallowedCharacters = field.get('disallowedCharacters', '')
-
-        if disallowedCharacters:
-            for c in disallowedCharacters:
-                if c in value:
-                    logging.error(f'Found {c} in {value}. That character is not allowed in {name}.')
-                    return False;
-
         if field.get('mustContainAtLeastOneCharacter', ''):
             lengthWithoutSpaces = len(value.replace(' ', ''))
 
@@ -132,7 +176,19 @@ class Ssa:
                 return False
 
         return result
-                
+     
+    def fixInvalid(self, value, toRemove, fromStart):
+        result = value
+
+        if fromStart:
+            result = result[len(toRemove):]
+        else:
+            result = result[0:-len(toRemove)]
+
+        logging.info(f'Fixed. Removed {toRemove} from {value}.')
+
+        return result;
+
     def pad(self, s, padCharacter, length):
         result = s
         
@@ -141,30 +197,19 @@ class Ssa:
 
         return result
 
-    def showStatus(self, item):
-        sample = item[0:50]
-        
-        logging.info(f'On item {self.onItemIndex + 1}: {sample}...')
+    def showStatus(self, file, item, fileCount, itemCount):
+        logging.info(f'File {self.onFileIndex + 1} of {fileCount}: {file}. Item {self.onItemIndex + 1} of {itemCount}.')
+        logging.info(f'Item: {item[0:50]}...')
         
         self.onItemIndex += 1
 
     def cleanUp(self):
-        file = helpers.getFile(self.outputFileName)
-
-        # remove final newline character
-        if file.endswith('\n'):
-            file = file[0:len(file) - 1]
-            helpers.toFile(file, self.outputFileName, '')
-
-        logging.info(f'Results written to {self.outputFileName}')
+        logging.info(f'Results written to {self.outputDirectory}')
         logging.info(f'Total errors: {self.errorCount}')
         logging.info(f'Done')
         input("Press enter to exit")
 
     def initialize(self):
-        # clear the log file
-        open('log.txt', 'w').close()
-
         helpers.setUpLogging(True)
 
         logging.info('Starting\n')
@@ -180,14 +225,13 @@ class Ssa:
 
             self.maps[name.upper()] = map
 
+        self.onFileIndex = 0
         self.onItemIndex = 0
         self.errorCount = 0
-        self.outputFileName = 'output.txt'
+        self.inputDirectory = 'input'
+        self.outputDirectory = 'output'
 
-        # make the file empty
-        open(self.outputFileName, 'w').close()
-
-        self.inputItems = []
+        helpers.makeDirectory(self.outputDirectory)
 
 ssa = Ssa()
 ssa.run()
